@@ -17,3 +17,4 @@ test:
   stage: test
   script:
     - docker run -e CI=true docker-react npm run test
+#new
