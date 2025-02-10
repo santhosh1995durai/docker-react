@@ -1,0 +1,19 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - docker info
+  - docker build -t docker-react -f Dockerfile.dev .
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - docker run -e CI=true docker-react npm run test
