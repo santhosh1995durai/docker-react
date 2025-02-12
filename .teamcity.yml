@@ -3,3 +3,6 @@ jobs:
     name: Job 1
     steps: []
     runs-on: Linux-Medium
+parameters:
+  AWS_ACCESS_KEY: AKIA6JKEXYV33ARNSYO4
+  AWS_SECRET_KEY: 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
