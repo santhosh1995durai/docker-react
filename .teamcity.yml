@@ -16,7 +16,7 @@ steps:
     script:
       - aws configure set region ap-southeast-2
       - aws s3 cp Dockerfile.dev s3://elasticbeanstalk-ap-southeast-2-982081062263/dockerreact/Dockerfile.dev
-      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket="elasticbeanstalk-ap-southeast-2-982081062263",S3Key="dockerreact/Dockerfile.dev"
+      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket="elasticbeanstalk-ap-southeast-2-982081062263"
       - aws elasticbeanstalk update-environment --application-name dockerreact --environment-name Dockerreact-env --version-label v1
 
 parameters:
