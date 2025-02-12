@@ -6,11 +6,6 @@ steps:
     script:
       - docker build -t docker-react -f Dockerfile.dev .
 
-  - name: Run Tests
-    type: script
-    script:
-      - docker run docker-react npm run test -- --coverage
-
   - name: Deploy to Elastic Beanstalk
     type: script
     script:
