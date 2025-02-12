@@ -1,0 +1,10 @@
+version: '2.0'
+
+steps:
+  - name: Build Docker Image
+    script: |
+      docker build -t docker-react -f Dockerfile.dev .
+
+  - name: Run Tests
+    script: |
+      docker run docker-react npm run test -- --coverage
