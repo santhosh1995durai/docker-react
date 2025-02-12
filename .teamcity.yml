@@ -1,28 +1,56 @@
 version: '1.0'
+
 parameters:
-  - name: access_key_id
-    value: "AKIA6JKEXYV33ARNSYO4"
-  - name: secret_access_key
-    value: "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"
-    
+  - name: env.access_key_id
+    value: "%aws_access_key_id%"
+  - name: env.secret_access_key
+    value: "%aws_secret_access_key%"
+  - name: env.aws_region
+    value: "ap-southeast-2"
+  - name: env.s3_bucket
+    value: "elasticbeanstalk-ap-southeast-2-982081062263"
+  - name: env.app_name
+    value: "dockerreact"
+  - name: env.env_name
+    value: "Dockerreact-env"
+  - name: env.version_label
+    value: "v1"
+  - name: env.package_file
+    value: "dockerreact.zip"
+
 steps:
   - name: Check AWS CLI
     type: script
     script:
       - aws --version
 
+  - name: Configure AWS CLI
+    type: script
+    script:
+      - aws configure set aws_access_key_id "%env.access_key_id%"
+      - aws configure set aws_secret_access_key "%env.secret_access_key%"
+      - aws configure set region "%env.aws_region%"
+
   - name: Build Docker Image
     type: script
     script:
       - docker build -t docker-react -f Dockerfile .
 
+  - name: Package Application
+    type: script
+    script:
+      - zip -r "%env.package_file%" Dockerrun.aws.json .ebextensions/ src/ Dockerfile
+
+  - name: Upload Package to S3
+    type: script
+    script:
+      - aws s3 cp "%env.package_file%" s3://%env.s3_bucket%/%env.app_name%/%env.package_file%
+
   - name: Deploy to Elastic Beanstalk
     type: script
     script:
-      - aws configure set region ap-southeast-2
-      - aws s3 cp Dockerfile s3://elasticbeanstalk-ap-southeast-2-982081062263/dockerreact/Dockerfile
-      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket=elasticbeanstalk-ap-southeast-2-982081062263,S3Key=dockerreact/Dockerfile
-      - aws elasticbeanstalk update-environment --application-name dockerreact --environment-name Dockerreact-env --version-label v1
+      - aws elasticbeanstalk create-application-version --application-name "%env.app_name%" --version-label "%env.version_label%" --source-bundle S3Bucket=%env.s3_bucket%,S3Key=%env.app_name%/%env.package_file%
+      - aws elasticbeanstalk update-environment --application-name "%env.app_name%" --environment-name "%env.env_name%" --version-label "%env.version_label%"
 
 triggers:
   - branch: master
