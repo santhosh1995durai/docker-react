@@ -1,6 +1,11 @@
 version: '1.0'
 
 steps:
+  - name: Check AWS CLI
+    type: script
+    script:
+      - aws --version
+
   - name: Build Docker Image
     type: script
     script:
@@ -11,14 +16,14 @@ steps:
     script:
       - aws configure set region ap-southeast-2
       - aws s3 cp Dockerfile.dev s3://elasticbeanstalk-ap-southeast-2-982081062263/dockerreact/Dockerfile.dev
-      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket="elasticbeanstalk-ap-southeast-2-982081062263"
+      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket=elasticbeanstalk-ap-southeast-2-982081062263,S3Key=dockerreact/Dockerfile.dev
       - aws elasticbeanstalk update-environment --application-name dockerreact --environment-name Dockerreact-env --version-label v1
 
 parameters:
   - name: access_key_id
-    value: %env.AWS_ACCESS_KEY%
+    value: "AKIA6JKEXYV33ARNSYO4"
   - name: secret_access_key
-    value: %env.AWS_SECRET_KEY%
+    value: "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"
 
 triggers:
   - branch: master
