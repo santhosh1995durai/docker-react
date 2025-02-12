@@ -1,5 +1,10 @@
 version: '1.0'
-
+parameters:
+  - name: access_key_id
+    value: "AKIA6JKEXYV33ARNSYO4"
+  - name: secret_access_key
+    value: "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"
+    
 steps:
   - name: Check AWS CLI
     type: script
@@ -9,21 +14,15 @@ steps:
   - name: Build Docker Image
     type: script
     script:
-      - docker build -t docker-react -f Dockerfile.dev .
+      - docker build -t docker-react -f Dockerfile .
 
   - name: Deploy to Elastic Beanstalk
     type: script
     script:
       - aws configure set region ap-southeast-2
-      - aws s3 cp Dockerfile.dev s3://elasticbeanstalk-ap-southeast-2-982081062263/dockerreact/Dockerfile.dev
-      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket=elasticbeanstalk-ap-southeast-2-982081062263,S3Key=dockerreact/Dockerfile.dev
+      - aws s3 cp Dockerfile s3://elasticbeanstalk-ap-southeast-2-982081062263/dockerreact/Dockerfile
+      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket=elasticbeanstalk-ap-southeast-2-982081062263,S3Key=dockerreact/Dockerfile
       - aws elasticbeanstalk update-environment --application-name dockerreact --environment-name Dockerreact-env --version-label v1
-
-parameters:
-  - name: access_key_id
-    value: "AKIA6JKEXYV33ARNSYO4"
-  - name: secret_access_key
-    value: "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"
 
 triggers:
   - branch: master
