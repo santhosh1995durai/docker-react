@@ -1,8 +1,29 @@
-jobs:
-  Job1:
-    name: Job 1
-    steps: []
-    runs-on: Linux-Medium
+version: '1.0'
+
+steps:
+  - name: Build Docker Image
+    type: script
+    script:
+      - docker build -t docker-react -f Dockerfile.dev .
+
+  - name: Run Tests
+    type: script
+    script:
+      - docker run docker-react npm run test -- --coverage
+
+  - name: Deploy to Elastic Beanstalk
+    type: script
+    script:
+      - aws configure set region ap-southeast-2
+      - aws s3 cp Dockerfile.dev s3://elasticbeanstalk-ap-southeast-2-982081062263/dockerreact/Dockerfile.dev
+      - aws elasticbeanstalk create-application-version --application-name dockerreact --version-label v1 --source-bundle S3Bucket="elasticbeanstalk-ap-southeast-2-982081062263",S3Key="dockerreact/Dockerfile.dev"
+      - aws elasticbeanstalk update-environment --application-name dockerreact --environment-name Dockerreact-env --version-label v1
+
 parameters:
-  AWS_ACCESS_KEY: AKIA6JKEXYV33ARNSYO4
-  AWS_SECRET_KEY: 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
+  - name: access_key_id
+    value: %env.AWS_ACCESS_KEY%
+  - name: secret_access_key
+    value: %env.AWS_SECRET_KEY%
+
+triggers:
+  - branch: master
