@@ -1,0 +1,24 @@
+name: React CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t santhoshdurai/docker-react -f Dockerfile.dev .
+
+      - name: Run React tests
+        run: docker run -e CI=true santhoshdurai/docker-react npm run test
+
